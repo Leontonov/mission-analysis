@@ -1,0 +1,188 @@
+%General Mission Analysis Tool(GMAT) Script
+%Created: 2026-09-17 23:40:04
+
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft Bacuzaa;
+Bacuzaa.DateFormat = UTCGregorian;
+Bacuzaa.Epoch = '17 Sep 2026 22:55:10.811';
+Bacuzaa.CoordinateSystem = EarthMJ2000Eq;
+Bacuzaa.DisplayStateType = Keplerian;
+Bacuzaa.SMA = 83474.31800000001;
+Bacuzaa.ECC = 0.89652;
+Bacuzaa.INC = 12.4606;
+Bacuzaa.RAAN = 292.8362;
+Bacuzaa.AOP = 218.9805;
+Bacuzaa.TA = 180;
+Bacuzaa.DryMass = 850;
+Bacuzaa.Cd = 2.2;
+Bacuzaa.Cr = 1.8;
+Bacuzaa.DragArea = 15;
+Bacuzaa.SRPArea = 1;
+Bacuzaa.SPADDragScaleFactor = 1;
+Bacuzaa.SPADSRPScaleFactor = 1;
+Bacuzaa.AtmosDensityScaleFactor = 1;
+Bacuzaa.ExtendedMassPropertiesModel = 'None';
+Bacuzaa.NAIFId = -10001001;
+Bacuzaa.NAIFIdReferenceFrame = -9001001;
+Bacuzaa.OrbitColor = Red;
+Bacuzaa.TargetColor = Teal;
+Bacuzaa.OrbitErrorCovariance = [ 1e+70 0 0 0 0 0 ; 0 1e+70 0 0 0 0 ; 0 0 1e+70 0 0 0 ; 0 0 0 1e+70 0 0 ; 0 0 0 0 1e+70 0 ; 0 0 0 0 0 1e+70 ];
+Bacuzaa.CdSigma = 1e+70;
+Bacuzaa.CrSigma = 1e+70;
+Bacuzaa.Id = 'SatId';
+Bacuzaa.Attitude = CoordinateSystemFixed;
+Bacuzaa.SPADSRPInterpolationMethod = Bilinear;
+Bacuzaa.SPADSRPScaleFactorSigma = 1e+70;
+Bacuzaa.SPADDragInterpolationMethod = Bilinear;
+Bacuzaa.SPADDragScaleFactorSigma = 1e+70;
+Bacuzaa.AtmosDensityScaleFactorSigma = 1e+70;
+Bacuzaa.ModelFile = 'aura.3ds';
+Bacuzaa.ModelOffsetX = 0;
+Bacuzaa.ModelOffsetY = 0;
+Bacuzaa.ModelOffsetZ = 0;
+Bacuzaa.ModelRotationX = 0;
+Bacuzaa.ModelRotationY = 0;
+Bacuzaa.ModelRotationZ = 0;
+Bacuzaa.ModelScale = 1;
+Bacuzaa.AttitudeDisplayStateType = 'Quaternion';
+Bacuzaa.AttitudeRateDisplayStateType = 'AngularVelocity';
+Bacuzaa.AttitudeCoordinateSystem = EarthMJ2000Eq;
+Bacuzaa.EulerAngleSequence = '321';
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel LowEarthProp_ForceModel;
+LowEarthProp_ForceModel.CentralBody = Earth;
+LowEarthProp_ForceModel.PrimaryBodies = {Earth};
+LowEarthProp_ForceModel.PointMasses = {Luna, Sun};
+LowEarthProp_ForceModel.SRP = On;
+LowEarthProp_ForceModel.RelativisticCorrection = Off;
+LowEarthProp_ForceModel.ErrorControl = RSSStep;
+LowEarthProp_ForceModel.GravityField.Earth.Degree = 10;
+LowEarthProp_ForceModel.GravityField.Earth.Order = 10;
+LowEarthProp_ForceModel.GravityField.Earth.StmLimit = 100;
+LowEarthProp_ForceModel.GravityField.Earth.PotentialFile = 'JGM2.cof';
+LowEarthProp_ForceModel.GravityField.Earth.TideModel = 'None';
+LowEarthProp_ForceModel.Drag.AtmosphereModel = JacchiaRoberts;
+LowEarthProp_ForceModel.Drag.HistoricWeatherSource = 'ConstantFluxAndGeoMag';
+LowEarthProp_ForceModel.Drag.PredictedWeatherSource = 'ConstantFluxAndGeoMag';
+LowEarthProp_ForceModel.Drag.CSSISpaceWeatherFile = 'SpaceWeather-All-v1.2.txt';
+LowEarthProp_ForceModel.Drag.SchattenFile = 'SchattenPredict.txt';
+LowEarthProp_ForceModel.Drag.F107 = 150;
+LowEarthProp_ForceModel.Drag.F107A = 150;
+LowEarthProp_ForceModel.Drag.MagneticIndex = 3;
+LowEarthProp_ForceModel.Drag.SchattenErrorModel = 'Nominal';
+LowEarthProp_ForceModel.Drag.SchattenTimingModel = 'NominalCycle';
+LowEarthProp_ForceModel.Drag.DragModel = 'Spherical';
+LowEarthProp_ForceModel.SRP.Flux = 1367;
+LowEarthProp_ForceModel.SRP.SRPModel = Spherical;
+LowEarthProp_ForceModel.SRP.Nominal_Sun = 149597870.691;
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator LowEarthProp;
+LowEarthProp.FM = LowEarthProp_ForceModel;
+LowEarthProp.Type = RungeKutta89;
+LowEarthProp.InitialStepSize = 60;
+LowEarthProp.Accuracy = 9.999999999999999e-12;
+LowEarthProp.MinStep = 0.001;
+LowEarthProp.MaxStep = 2700;
+LowEarthProp.MaxStepAttempts = 50;
+LowEarthProp.StopIfAccuracyIsViolated = true;
+
+%----------------------------------------
+%---------- Subscribers
+%----------------------------------------
+
+Create OpenFramesInterface DefaultOrbitView;
+DefaultOrbitView.SolverIterations = Current;
+DefaultOrbitView.UpperLeft = [ 0 0.01875 ];
+DefaultOrbitView.Size = [ 0.78125 0.98125 ];
+DefaultOrbitView.RelativeZOrder = 116;
+DefaultOrbitView.Maximized = false;
+DefaultOrbitView.Add = {Bacuzaa, Earth};
+DefaultOrbitView.View = {DefaultOrbitView_View};
+DefaultOrbitView.CoordinateSystem = EarthMJ2000Eq;
+DefaultOrbitView.DrawObject = [ true true ];
+DefaultOrbitView.DrawTrajectory = [ true true ];
+DefaultOrbitView.DrawAxes = [ false false ];
+DefaultOrbitView.DrawXYPlane = [ false false ];
+DefaultOrbitView.DrawLabel = [ true true ];
+DefaultOrbitView.DrawUsePropLabel = [ false false ];
+DefaultOrbitView.DrawCenterPoint = [ true true ];
+DefaultOrbitView.DrawEndPoints = [ true true ];
+DefaultOrbitView.DrawVelocity = [ false false ];
+DefaultOrbitView.DrawGrid = [ false false ];
+DefaultOrbitView.DrawLineWidth = [ 2 2 ];
+DefaultOrbitView.DrawMarkerSize = [ 10 10 ];
+DefaultOrbitView.DrawFontSize = [ 20 20 ];
+DefaultOrbitView.Axes = On;
+DefaultOrbitView.AxesLength = 12756.2726;
+DefaultOrbitView.AxesLabels = On;
+DefaultOrbitView.FrameLabel = Off;
+DefaultOrbitView.XYPlane = Off;
+DefaultOrbitView.EclipticPlane = Off;
+DefaultOrbitView.EnableStars = On;
+DefaultOrbitView.StarCatalog = 'inp_StarsHYGv3.txt';
+DefaultOrbitView.StarCount = 40000;
+DefaultOrbitView.MinStarMag = -2;
+DefaultOrbitView.MaxStarMag = 6;
+DefaultOrbitView.MinStarPixels = 1;
+DefaultOrbitView.MaxStarPixels = 10;
+DefaultOrbitView.MinStarDimRatio = 0.5;
+DefaultOrbitView.ShowPlot = true;
+DefaultOrbitView.ShowToolbar = true;
+DefaultOrbitView.SolverIterLastN = 1;
+DefaultOrbitView.ShowVR = false;
+DefaultOrbitView.PlaybackTimeScale = 3600;
+DefaultOrbitView.MultisampleAntiAliasing = On;
+DefaultOrbitView.MSAASamples = 2;
+DefaultOrbitView.DrawFontPosition = {'Top-Right', 'Top-Right'};
+
+Create GroundTrack DefaultGroundTrackPlot;
+DefaultGroundTrackPlot.SolverIterations = Current;
+DefaultGroundTrackPlot.UpperLeft = [ 0.53125 0.33375 ];
+DefaultGroundTrackPlot.Size = [ 0.46875 0.625 ];
+DefaultGroundTrackPlot.RelativeZOrder = 112;
+DefaultGroundTrackPlot.Maximized = false;
+DefaultGroundTrackPlot.CentralBody = Earth;
+DefaultGroundTrackPlot.Add = {Bacuzaa};
+DefaultGroundTrackPlot.DataCollectFrequency = 1;
+DefaultGroundTrackPlot.UpdatePlotFrequency = 50;
+DefaultGroundTrackPlot.NumPointsToRedraw = 0;
+DefaultGroundTrackPlot.MaxPlotPoints = 20000;
+DefaultGroundTrackPlot.ShowPlot = true;
+
+%----------------------------------------
+%---------- User Objects
+%----------------------------------------
+
+Create OpenFramesView DefaultOrbitView_View;
+DefaultOrbitView_View.ViewFrame = CoordinateSystem;
+DefaultOrbitView_View.ViewTrajectory = Off;
+DefaultOrbitView_View.InertialFrame = Off;
+DefaultOrbitView_View.SetDefaultLocation = On;
+DefaultOrbitView_View.DefaultEye = [ 30000 0 0 ];
+DefaultOrbitView_View.DefaultCenter = [ 0 0 0 ];
+DefaultOrbitView_View.DefaultUp = [ 0 0 1 ];
+DefaultOrbitView_View.SetCurrentLocation = On;
+DefaultOrbitView_View.CurrentEye = [ 183200.5507603063 23356.47970263391 125441.9472579573 ];
+DefaultOrbitView_View.CurrentCenter = [ 0 -1.818989403545856e-11 0 ];
+DefaultOrbitView_View.CurrentUp = [ 0.5673587969301742 -0.03056317399111652 -0.8229033284302197 ];
+DefaultOrbitView_View.FOVy = 45;
+
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+BeginMissionSequence;
+Propagate LowEarthProp(Bacuzaa) {Bacuzaa.ElapsedSecs = Bacuzaa.Earth.OrbitPeriod};
